@@ -6,7 +6,6 @@
     <title>Servis Cari Kajian Lepas STPM - 4 Flat Di Dalam Tangan</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;800&family=Orbitron:wght@400;700;900&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -39,45 +38,30 @@
             z-index: 1;
         }
 
-        /* Scanlines & Noise */
-        .scanlines {
+        .scanlines, .noise, .vignette {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0) 50%,
-                rgba(0,0,0,0.1) 50%
-            );
-            background-size: 100% 4px;
-            z-index: 5;
             pointer-events: none;
+            z-index: 5;
+        }
+
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%);
+            background-size: 100% 4px;
             opacity: 0.4;
         }
 
         .noise {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 6;
-            pointer-events: none;
             opacity: 0.05;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         .vignette {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
             background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
             z-index: 7;
-            pointer-events: none;
         }
 
         /* Main Container */
@@ -87,20 +71,57 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* TOP NAV BUTTON - SENTIASA NAMPAK */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        .nav-button {
+            padding: 15px 35px;
+            background: linear-gradient(135deg, var(--primary), #0099cc);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 5px 30px rgba(0,212,255,0.4);
+            animation: pulse 2s infinite;
+            transition: all 0.3s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 5px 30px rgba(0,212,255,0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 10px 40px rgba(0,212,255,0.6); }
+        }
+
+        .nav-button:hover {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #00e5ff, #00b4d8);
         }
 
         /* Hero Text */
         .hero-text {
             text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .glitch-container {
-            position: relative;
-            display: inline-block;
+            margin-top: 100px;
+            margin-bottom: 40px;
         }
 
         .main-title {
@@ -129,7 +150,7 @@
             color: rgba(255,255,255,0.8);
         }
 
-        /* 3D Cards */
+        /* Cards */
         .cards-container {
             display: flex;
             gap: 25px;
@@ -196,174 +217,95 @@
             color: var(--accent);
         }
 
-        /* BUTTON CONTAINER - PALING PENTING */
-        .button-container {
-            margin-top: 50px;
+        /* BOTTOM CTA SECTION */
+        .cta-section {
+            margin-top: 60px;
             text-align: center;
-            position: relative;
-            z-index: 100;
+            padding: 40px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
         }
 
-        /* MAIN CTA BUTTON - BESAR & NAMPAK */
+        .cta-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+
         .main-cta-button {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 15px;
-            padding: 30px 60px;
-            background: linear-gradient(135deg, var(--primary), #0099cc);
-            border: 3px solid rgba(255,255,255,0.3);
+            padding: 25px 50px;
+            background: linear-gradient(135deg, var(--accent), #ff8c00);
+            border: none;
             border-radius: 60px;
-            color: white;
+            color: black;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             cursor: pointer;
             text-decoration: none;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 10px 40px rgba(0,212,255,0.4),
-                0 0 60px rgba(0,212,255,0.2),
-                inset 0 1px 0 rgba(255,255,255,0.3);
-            animation: buttonPulse 2s infinite, buttonFloat 3s ease-in-out infinite;
+            box-shadow: 0 10px 40px rgba(255,215,0,0.4);
+            animation: float 3s ease-in-out infinite;
             transition: all 0.3s;
         }
 
-        @keyframes buttonPulse {
-            0%, 100% { 
-                box-shadow: 
-                    0 10px 40px rgba(0,212,255,0.4),
-                    0 0 60px rgba(0,212,255,0.2);
-            }
-            50% { 
-                box-shadow: 
-                    0 15px 50px rgba(0,212,255,0.6),
-                    0 0 80px rgba(0,212,255,0.4),
-                    0 0 100px rgba(0,212,255,0.2);
-            }
-        }
-
-        @keyframes buttonFloat {
+        @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
 
         .main-cta-button:hover {
-            transform: scale(1.05) translateY(-5px);
-            background: linear-gradient(135deg, #00e5ff, #00b4d8);
-            box-shadow: 
-                0 20px 60px rgba(0,212,255,0.6),
-                0 0 100px rgba(0,212,255,0.4);
+            transform: scale(1.1);
+            box-shadow: 0 20px 60px rgba(255,215,0,0.6);
         }
 
-        .main-cta-button::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent 30%,
-                rgba(255,255,255,0.3) 50%,
-                transparent 70%
-            );
-            transform: rotate(45deg) translateX(-100%);
-            transition: transform 0.6s;
-        }
-
-        .main-cta-button:hover::before {
-            transform: rotate(45deg) translateX(100%);
-        }
-
-        .button-arrow {
-            font-size: 2rem;
-            animation: arrowBounce 1s infinite;
-        }
-
-        @keyframes arrowBounce {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(10px); }
-        }
-
-        /* Secondary text under button */
-        .button-subtext {
-            margin-top: 20px;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-        }
-
-        /* Scroll indicator */
-        .scroll-indicator {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-10px); }
-        }
-
-        /* Loading Screen */
-        .loader-screen {
+        /* FIXED BOTTOM BUTTON */
+        .fixed-bottom {
             position: fixed;
-            top: 0;
+            bottom: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark);
-            z-index: 1000;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
             display: flex;
             justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            transition: opacity 0.8s, visibility 0.8s;
+            z-index: 1000;
         }
 
-        .loader-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loader-ring {
-            width: 100px;
-            height: 100px;
-            border: 4px solid transparent;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loader-text {
-            margin-top: 20px;
+        .bottom-button {
+            padding: 20px 50px;
+            background: linear-gradient(135deg, var(--secondary), #cc00cc);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            color: white;
             font-family: 'Orbitron', sans-serif;
-            color: var(--primary);
-            letter-spacing: 3px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 5px 30px rgba(255,0,255,0.4);
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 5px 30px rgba(255,0,255,0.4); }
+            to { box-shadow: 0 10px 50px rgba(255,0,255,0.7); }
         }
 
         /* Music Control */
         .music-control {
             position: fixed;
-            bottom: 30px;
+            bottom: 100px;
             right: 30px;
             z-index: 100;
             background: rgba(0,0,0,0.5);
@@ -371,38 +313,24 @@
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 50px;
             padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .music-control:hover {
-            border-color: var(--primary);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .main-title {
-                font-size: 3rem;
-            }
-            .main-cta-button {
-                padding: 20px 40px;
-                font-size: 1.2rem;
-            }
-            .cards-container {
-                flex-direction: column;
-                align-items: center;
-            }
+            .main-title { font-size: 3rem; }
+            .cards-container { flex-direction: column; }
+            .nav-button { font-size: 0.9rem; padding: 12px 25px; }
+            .main-cta-button { font-size: 1rem; padding: 20px 40px; }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loader-screen" id="loader">
-        <div class="loader-ring"></div>
-        <div class="loader-text">CARI KAJIAN LEPAS STPM @stpm20266...</div>
+    <!-- TOP NAV BUTTON -->
+    <div class="top-nav">
+        <a href="harga.html" class="nav-button">
+            🛒 LIHAT HARGA & ORDER
+        </a>
     </div>
 
     <!-- Three.js Canvas -->
@@ -416,9 +344,7 @@
     <!-- Main Content -->
     <div class="container">
         <div class="hero-text">
-            <div class="glitch-container">
-                <h1 class="main-title">4 FLAT</h1>
-            </div>
+            <h1 class="main-title" id="mainTitle">4 FLAT</h1>
             <div class="cyber-subtitle">DI DALAM TANGAN ANDA</div>
         </div>
 
@@ -427,7 +353,7 @@
                 <div class="card-face card-front">
                     <span class="card-icon">📜</span>
                     <h3 class="card-title">SEJARAH</h3>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">4 Kajian</p>
+                    <p style="color: rgba(255,255,255,0.7);">4 Kajian Lengkap</p>
                 </div>
                 <div class="card-face card-back">
                     <span class="card-icon">💎</span>
@@ -439,7 +365,7 @@
                 <div class="card-face card-front">
                     <span class="card-icon">🇲🇾</span>
                     <h3 class="card-title">PENGAJIAN AM</h3>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">7 Kajian</p>
+                    <p style="color: rgba(255,255,255,0.7);">7 Kajian Siap</p>
                 </div>
                 <div class="card-face card-back">
                     <span class="card-icon">⚡</span>
@@ -451,7 +377,7 @@
                 <div class="card-face card-front">
                     <span class="card-icon">✍️</span>
                     <h3 class="card-title">ADD-ON</h3>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Servis Tambahan</p>
+                    <p style="color: rgba(255,255,255,0.7);">Servis Tambahan</p>
                 </div>
                 <div class="card-face card-back">
                     <span class="card-icon">🚀</span>
@@ -460,47 +386,38 @@
             </div>
         </div>
 
-        <!-- BUTTON CONTAINER - PALING PENTING -->
-        <div class="button-container">
-            <a href="harga.html" class="main-cta-button" onclick="goToHarga(event)">
-                <span>🛒</span>
+        <!-- MIDDLE CTA -->
+        <div class="cta-section">
+            <div class="cta-title">✨ SEDIA UNTUK ORDER? ✨</div>
+            <a href="harga.html" class="main-cta-button">
+                <span>📋</span>
                 <span>LIHAT SENARAI HARGA</span>
-                <span class="button-arrow">→</span>
+                <span>→</span>
             </a>
-            <div class="button-subtext">Klik untuk melihat pakej lengkap & order</div>
         </div>
 
-        <p style="margin-top: 40px; color: rgba(255,255,255,0.3); font-size: 0.8rem;">
-            SERVIS CARI KAJIAN LEPAS STPM © @stpm20266
+        <p style="margin-top: 150px; color: rgba(255,255,255,0.3); font-size: 0.8rem;">
+            SERVIS CARI KAJIAN LEPAS STPM © 2026
         </p>
     </div>
 
-    <!-- Scroll Indicator -->
-    <div class="scroll-indicator">
-        <span>SCROLL</span>
-        <span>↓</span>
+    <!-- FIXED BOTTOM BUTTON -->
+    <div class="fixed-bottom">
+        <a href="harga.html" class="bottom-button">
+            🛒 ORDER SEKARANG →
+        </a>
     </div>
 
     <!-- Music Control -->
     <div class="music-control" onclick="toggleMusic()">
         <span id="musicIcon">🎵</span>
-        <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Music</span>
     </div>
 
-    <!-- Audio -->
     <audio id="bgMusic" loop>
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        // Hide loader
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').classList.add('hidden');
-                initThreeJS();
-            }, 1500);
-        });
-
         // Three.js
         function initThreeJS() {
             const container = document.getElementById('canvas-container');
@@ -511,7 +428,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             container.appendChild(renderer.domElement);
 
-            // Particles
             const geometry = new THREE.BufferGeometry();
             const count = 1500;
             const positions = new Float32Array(count * 3);
@@ -541,22 +457,14 @@
             const particles = new THREE.Points(geometry, material);
             scene.add(particles);
 
-            // Wireframe spheres
             const sphere1 = new THREE.Mesh(
                 new THREE.IcosahedronGeometry(10, 1),
                 new THREE.MeshBasicMaterial({ color: 0x00d4ff, wireframe: true, transparent: true, opacity: 0.1 })
             );
             scene.add(sphere1);
 
-            const sphere2 = new THREE.Mesh(
-                new THREE.IcosahedronGeometry(15, 1),
-                new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true, transparent: true, opacity: 0.05 })
-            );
-            scene.add(sphere2);
-
             camera.position.z = 30;
 
-            // Mouse
             let mouseX = 0, mouseY = 0;
             document.addEventListener('mousemove', (e) => {
                 mouseX = (e.clientX / window.innerWidth) * 2 - 1;
@@ -565,17 +473,11 @@
 
             function animate() {
                 requestAnimationFrame(animate);
-                
                 particles.rotation.y += 0.001;
-                particles.rotation.x += 0.0005;
-                
                 sphere1.rotation.y += 0.002;
-                sphere2.rotation.y -= 0.001;
-                
                 camera.position.x += (mouseX * 2 - camera.position.x) * 0.05;
                 camera.position.y += (mouseY * 2 - camera.position.y) * 0.05;
                 camera.lookAt(scene.position);
-                
                 renderer.render(scene, camera);
             }
             animate();
@@ -587,38 +489,31 @@
             });
         }
 
-        // Go to harga page
-        function goToHarga(e) {
-            e.preventDefault();
-            document.getElementById('loader').classList.remove('hidden');
-            document.querySelector('.loader-text').textContent = 'LOADING...';
-            setTimeout(() => {
-                window.location.href = 'harga.html';
-            }, 1000);
-        }
-
-        // Music
-        let isPlaying = false;
-        const music = document.getElementById('bgMusic');
-        function toggleMusic() {
-            if(isPlaying) {
-                music.pause();
-                document.getElementById('musicIcon').textContent = '🎵';
-            } else {
-                music.play();
-                document.getElementById('musicIcon').textContent = '🔊';
-            }
-            isPlaying = !isPlaying;
-        }
+        window.addEventListener('load', initThreeJS);
 
         // Text change
         setInterval(() => {
             const texts = ['4 FLAT', 'A+', 'CEMERLANG'];
-            const title = document.querySelector('.main-title');
+            const title = document.getElementById('mainTitle');
             const current = title.textContent;
             const next = texts[(texts.indexOf(current) + 1) % texts.length];
             title.textContent = next;
         }, 3000);
+
+        // Music
+        let isPlaying = false;
+        function toggleMusic() {
+            const music = document.getElementById('bgMusic');
+            const icon = document.getElementById('musicIcon');
+            if(isPlaying) {
+                music.pause();
+                icon.textContent = '🎵';
+            } else {
+                music.play();
+                icon.textContent = '🔊';
+            }
+            isPlaying = !isPlaying;
+        }
     </script>
 </body>
 </html>
