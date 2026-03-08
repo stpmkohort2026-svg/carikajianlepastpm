@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Servis Cari Kajian Lepas STPM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Servis Cari Kajian Lepas STPM - 4 Flat Di Dalam Tangan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -17,761 +17,611 @@
             --secondary: #ff00ff;
             --accent: #ffd700;
             --dark: #0a0a0f;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--dark);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
             overflow-x: hidden;
+            color: white;
         }
 
-        /* Animated Background */
-        .bg-animation {
+        /* Particle Canvas */
+        #particles-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Animated Background Orbs */
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
             overflow: hidden;
         }
 
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: float 20s infinite ease-in-out;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
         }
 
         .orb-1 {
-            width: 400px;
-            height: 400px;
+            width: 600px;
+            height: 600px;
             background: var(--primary);
-            top: -100px;
-            left: -100px;
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
         }
 
         .orb-2 {
-            width: 300px;
-            height: 300px;
+            width: 500px;
+            height: 500px;
             background: var(--secondary);
-            bottom: -50px;
-            right: -50px;
+            bottom: -150px;
+            right: -150px;
             animation-delay: -5s;
         }
 
         .orb-3 {
-            width: 250px;
-            height: 250px;
+            width: 400px;
+            height: 400px;
             background: var(--accent);
             top: 50%;
             left: 50%;
+            transform: translate(-50%, -50%);
             animation-delay: -10s;
         }
 
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
+            33% { transform: translate(50px, -50px) scale(1.2); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
         }
 
-        .poster {
+        /* Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 480px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            position: relative;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.1) 50%,
+                rgba(0,0,0,0.1)
+            );
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.3;
         }
 
-        .poster::before {
-            content: '';
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+        }
+
+        /* Glitch Text Effect */
+        .glitch-wrapper {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .glitch {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            position: relative;
+            text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                        0.025em 0.04em 0 #fffc00;
+            animation: glitch 725ms infinite;
+            letter-spacing: 0.1em;
+        }
+
+        .glitch span {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
         }
 
-        /* Header */
-        .header {
-            padding: 40px 30px 30px;
-            text-align: center;
-            position: relative;
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                            0.025em 0.04em 0 #fffc00; }
+            15% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                            0.025em 0.04em 0 #fffc00; }
+            16% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff,
+                            -0.05em -0.05em 0 #fffc00; }
+            49% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff,
+                            -0.05em -0.05em 0 #fffc00; }
+            50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff,
+                            0 -0.04em 0 #fffc00; }
+            99% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff,
+                            0 -0.04em 0 #fffc00; }
+            100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff,
+                            -0.04em -0.025em 0 #fffc00; }
         }
 
-        .badge-premium {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.05));
-            border: 1px solid rgba(255,215,0,0.3);
-            color: var(--accent);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            animation: glow 3s infinite alternate;
+        /* Subtitle with typing effect */
+        .subtitle-container {
+            height: 60px;
+            margin-bottom: 40px;
         }
 
-        @keyframes glow {
-            from { box-shadow: 0 0 5px rgba(255,215,0,0.3); }
-            to { box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.3); }
-        }
-
-        .header h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-            letter-spacing: -1px;
-            line-height: 1.2;
-        }
-
-        .header .subtitle {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
+        .typing-text {
+            font-size: 1.5rem;
+            color: rgba(255,255,255,0.8);
             font-weight: 300;
+            letter-spacing: 3px;
+            border-right: 3px solid var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+            margin: 0 auto;
         }
 
-        .tagline {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,212,255,0.05));
-            border: 1px solid rgba(0,212,255,0.2);
-            border-radius: 50px;
-            display: inline-block;
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
         }
 
-        /* Content */
-        .content {
-            padding: 0 25px 25px;
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary); }
         }
 
-        /* Package Cards */
-        .package-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px;
-            padding: 25px;
-            margin-bottom: 20px;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
         }
 
-        .package-card::before {
+        .feature-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: left 0.5s;
         }
 
-        .package-card:hover::before {
+        .feature-card:hover::before {
             left: 100%;
         }
 
-        .package-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.3);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0,212,255,0.2);
         }
 
-        .package-card.sejarah {
-            border-left: 4px solid #00d4ff;
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            animation: bounce 2s infinite;
         }
 
-        .package-card.pa {
-            border-left: 4px solid #ff00ff;
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .subject-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .icon-box {
-            width: 50px;
-            height: 50px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .sejarah .icon-box {
-            background: rgba(0,212,255,0.1);
-            border-color: rgba(0,212,255,0.3);
-        }
-
-        .pa .icon-box {
-            background: rgba(255,0,255,0.1);
-            border-color: rgba(255,0,255,0.3);
-        }
-
-        .subject-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .subject-code {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.5);
-            margin-top: 2px;
-            letter-spacing: 1px;
-        }
-
-        .price-tag {
-            text-align: right;
-        }
-
-        .price-main {
-            font-size: 2rem;
-            font-weight: 800;
-            color: white;
-            line-height: 1;
-        }
-
-        .price-main span {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
-            font-weight: 400;
-        }
-
-        .study-count {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(255,255,255,0.1);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.8);
-            margin-top: 8px;
-        }
-
-        .price-details {
-            background: rgba(0,0,0,0.2);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
-        }
-
-        .detail-value {
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .contact-btn {
-            width: 100%;
-            background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.05));
-            border: 1px solid rgba(0,212,255,0.3);
-            color: var(--primary);
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 0.95rem;
-        }
-
-        .contact-btn:hover {
-            background: linear-gradient(135deg, rgba(0,212,255,0.3), rgba(0,212,255,0.1));
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(0,212,255,0.3);
-        }
-
-        /* Add-on Section */
-        .addon-section {
-            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
-            border: 1px solid rgba(255,215,0,0.2);
-            border-radius: 24px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .addon-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            color: var(--accent);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .addon-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 12px;
+        .feature-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
             margin-bottom: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--primary);
         }
 
-        .addon-name {
-            color: rgba(255,255,255,0.9);
-            font-weight: 500;
-        }
-
-        .addon-price {
-            background: linear-gradient(135deg, var(--accent), #ff8c00);
-            color: black;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: 700;
+        .feature-desc {
             font-size: 0.9rem;
-        }
-
-        /* Speed Badge */
-        .speed-section {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .speed-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg, rgba(255,0,100,0.2), rgba(255,0,100,0.05));
-            border: 1px solid rgba(255,0,100,0.4);
-            color: #ff4d8d;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255,0,100,0.4); }
-            50% { box-shadow: 0 0 0 15px rgba(255,0,100,0); }
-        }
-
-        /* Contact Section */
-        .contact-section {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 30px;
-            text-align: center;
-        }
-
-        .contact-title {
             color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
         }
 
-        .contact-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
+        /* CTA Button */
+        .cta-container {
+            text-align: center;
+            position: relative;
         }
 
-        .btn-contact {
+        .cta-button {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 14px 28px;
-            border-radius: 16px;
+            gap: 15px;
+            padding: 20px 50px;
+            background: linear-gradient(135deg, var(--primary), #0099cc);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
             font-weight: 700;
-            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
             transition: all 0.3s;
-            font-size: 0.95rem;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0,212,255,0.3);
         }
 
-        .btn-order {
-            background: linear-gradient(135deg, #0088cc, #00a8e6);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,136,204,0.3);
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
         }
 
-        .btn-order:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,136,204,0.4);
+        .cta-button:hover::before {
+            left: 100%;
         }
 
-        .btn-group {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            color: white;
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,212,255,0.5);
+        }
+
+        .arrow {
+            animation: arrow-bounce 1s infinite;
+        }
+
+        @keyframes arrow-bounce {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        /* Floating badges */
+        .floating-badges {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .float-badge {
+            position: absolute;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            animation: float-badge 10s infinite ease-in-out;
         }
 
-        .btn-group:hover {
-            transform: translateY(-3px);
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
-            border-color: rgba(255,255,255,0.3);
+        .float-badge:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
         }
 
-        .copyright {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.5);
-            font-size: 0.75rem;
-            line-height: 1.6;
+        .float-badge:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: -3s;
         }
 
-        .copyright strong {
-            color: var(--accent);
-            font-weight: 600;
+        .float-badge:nth-child(3) {
+            bottom: 20%;
+            left: 15%;
+            animation-delay: -6s;
         }
 
-        /* Modal */
-        .modal {
-            display: none;
+        @keyframes float-badge {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+            50% { transform: translateY(-20px) rotate(5deg); opacity: 1; }
+        }
+
+        /* Loading animation before redirect */
+        .loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: var(--dark);
             z-index: 1000;
+            display: flex;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
         }
 
-        .modal.active {
-            display: flex;
+        .loader.active {
+            opacity: 1;
+            pointer-events: all;
         }
 
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px;
-            padding: 30px;
-            max-width: 350px;
-            width: 90%;
+        .loader-content {
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
 
-        .modal-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
+        .loader-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
 
-        .modal h3 {
-            color: white;
-            font-family: 'Space Grotesk', sans-serif;
-            margin-bottom: 10px;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .modal p {
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+        .loader-text {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            letter-spacing: 3px;
         }
 
-        .modal-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .glitch {
+                font-size: 2.5rem;
+            }
+            .typing-text {
+                font-size: 1rem;
+            }
+            .features {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .modal-btn {
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            text-decoration: none;
-        }
-
-        .modal-btn-order {
-            background: linear-gradient(135deg, #0088cc, #00a8e6);
-            color: white;
-        }
-
-        .modal-btn-order:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(0,136,204,0.4);
-        }
-
-        .modal-btn-group {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .modal-btn-group:hover {
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .modal-btn-cancel {
-            background: transparent;
-            color: rgba(255,255,255,0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .modal-btn-cancel:hover {
-            color: white;
-            border-color: rgba(255,255,255,0.3);
+        /* Glow effect */
+        .glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0,212,255,0.2) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -1;
         }
     </style>
 </head>
 <body>
-    <!-- Background Animation -->
-    <div class="bg-animation">
+    <!-- Particle Canvas -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Background Orbs -->
+    <div class="bg-orbs">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
     </div>
 
-    <div class="poster">
-        <!-- Header -->
-        <div class="header">
-            <div class="badge-premium">✨ SERVIS PREMIUM</div>
-            <h1>SERVIS CARI KAJIAN LEPAS STPM</h1>
-            <div class="subtitle">Senarai Harga Ikut Subjek (Terkini)</div>
-            <div class="tagline">🎯 4 FLAT DI DALAM TANGAN</div>
+    <!-- Scanlines -->
+    <div class="scanlines"></div>
+
+    <!-- Floating Badges -->
+    <div class="floating-badges">
+        <div class="float-badge">⚡ 10 Minit Siap</div>
+        <div class="float-badge">📚 Kajian Lengkap</div>
+        <div class="float-badge">🎯 4 Flat Guarantee</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="glitch-wrapper">
+            <div class="glitch" data-text="4 FLAT">4 FLAT</div>
         </div>
 
-        <div class="content">
-            <!-- Sejarah Package -->
-            <div class="package-card sejarah" onclick="openModal('sejarah')">
-                <div class="card-header">
-                    <div class="subject-info">
-                        <div class="icon-box">📜</div>
-                        <div>
-                            <div class="subject-title">SEJARAH</div>
-                            <div class="subject-code">KAJIAN SEJARAH</div>
-                        </div>
-                    </div>
-                    <div class="price-tag">
-                        <div class="price-main">RM3<span>/pakej</span></div>
-                        <div class="study-count">📚 4 Kajian</div>
-                    </div>
-                </div>
-                
-                <div class="price-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Harga Pakej</span>
-                        <span class="detail-value">RM 3.00</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Harga Satuan</span>
-                        <span class="detail-value">RM 1.00/kajian</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Syarat Satuan</span>
-                        <span class="detail-value">Bawah 4 unit</span>
-                    </div>
-                </div>
+        <div class="subtitle-container">
+            <div class="typing-text">Di Dalam Tangan Anda...</div>
+        </div>
 
-                <button class="contact-btn">
-                    📲 Tekan untuk Order Sejarah
-                </button>
+        <div class="features">
+            <div class="feature-card">
+                <span class="feature-icon">📜</span>
+                <h3 class="feature-title">SEJARAH</h3>
+                <p class="feature-desc">4 Kajian lengkap dengan harga murah</p>
             </div>
-
-            <!-- Pengajian Am Package -->
-            <div class="package-card pa" onclick="openModal('pa')">
-                <div class="card-header">
-                    <div class="subject-info">
-                        <div class="icon-box">🇲🇾</div>
-                        <div>
-                            <div class="subject-title">PENGAJIAN AM</div>
-                            <div class="subject-code">KAJIAN PENGAJIAN AM</div>
-                        </div>
-                    </div>
-                    <div class="price-tag">
-                        <div class="price-main">RM6<span>/pakej</span></div>
-                        <div class="study-count">📚 7 Kajian</div>
-                    </div>
-                </div>
-
-                <div class="price-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Harga Pakej</span>
-                        <span class="detail-value">RM 6.00</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Harga Satuan</span>
-                        <span class="detail-value">RM 1.00/kajian</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Syarat Satuan</span>
-                        <span class="detail-value">Bawah 7 unit</span>
-                    </div>
-                </div>
-
-                <button class="contact-btn">
-                    📲 Tekan untuk Order PA
-                </button>
+            <div class="feature-card">
+                <span class="feature-icon">🇲🇾</span>
+                <h3 class="feature-title">PENGAJIAN AM</h3>
+                <p class="feature-desc">7 Kajian siap dalam 10 minit</p>
             </div>
-
-            <!-- Add-ons -->
-            <div class="addon-section">
-                <div class="addon-header">
-                    <span>✍️</span>
-                    <span>SERVIS TAMBAHAN (ADD-ON)</span>
-                </div>
-                <div class="addon-item">
-                    <span class="addon-name">📝 Rumusan Kajian</span>
-                    <span class="addon-price">RM 2</span>
-                </div>
-                <div class="addon-item">
-                    <span class="addon-name">📚 Bibliografi</span>
-                    <span class="addon-price">RM 3</span>
-                </div>
-            </div>
-
-            <!-- Speed Badge -->
-            <div class="speed-section">
-                <div class="speed-badge">
-                    ⚡ 10 MINIT SIAP! ⚡
-                </div>
+            <div class="feature-card">
+                <span class="feature-icon">✍️</span>
+                <h3 class="feature-title">ADD-ON</h3>
+                <p class="feature-desc">Rumusan & Bibliografi tersedia</p>
             </div>
         </div>
 
-        <!-- Contact Section -->
-        <div class="contact-section">
-            <div class="contact-title">HUBUNGI KAMI SEKARANG</div>
-            <div class="contact-buttons">
-                <a href="https://t.me/CariKajianLepasStpm_bot" target="_blank" class="btn-contact btn-order">
-                    📨 Order via Telegram
-                </a>
-                <a href="https://t.me/stpm20266" target="_blank" class="btn-contact btn-group">
-                    👥 Join Official Group
-                </a>
-            </div>
-            
-            <div class="copyright">
-                <strong>STPM 2026 SILIBUS BAHARU 07</strong><br>
-                @stpm20266<br>
+        <div class="cta-container">
+            <a href="harga.html" class="cta-button" onclick="showLoader(event)">
+                Lihat Senarai Harga
+                <span class="arrow">→</span>
+            </a>
+            <p style="margin-top: 20px; color: rgba(255,255,255,0.5); font-size: 0.9rem;">
                 Servis Cari Kajian Lepas STPM © 2024
-            </div>
+            </p>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal" id="orderModal">
-        <div class="modal-content">
-            <div class="modal-icon">🎓</div>
-            <h3 id="modalTitle">Order Subjek</h3>
-            <p id="modalText">Pilih destinasi:</p>
-            <div class="modal-buttons">
-                <a href="#" id="modalOrderBtn" class="modal-btn modal-btn-order" target="_blank">
-                    📨 Pergi ke Bot Order
-                </a>
-                <a href="https://t.me/stpm20266" class="modal-btn modal-btn-group" target="_blank">
-                    👥 Pergi ke Official Group
-                </a>
-                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">
-                    Batal
-                </button>
-            </div>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">MEMUAT...</div>
         </div>
     </div>
 
     <script>
-        let currentSubject = '';
+        // Particle System
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-        function openModal(subject) {
-            currentSubject = subject;
-            const modal = document.getElementById('orderModal');
-            const title = document.getElementById('modalTitle');
-            const text = document.getElementById('modalText');
-            const orderBtn = document.getElementById('modalOrderBtn');
+        const particles = [];
+        const particleCount = 100;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = Math.random() > 0.5 ? '#00d4ff' : '#ff00ff';
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            if (subject === 'sejarah') {
-                title.textContent = '📜 Order Sejarah';
-                text.textContent = 'Pakej Sejarah (4 Kajian) - RM3.00. Pilih destinasi:';
-                orderBtn.href = 'https://t.me/CariKajianLepasStpm_bot?start=order_sejarah';
-            } else if (subject === 'pa') {
-                title.textContent = '🇲🇾 Order Pengajian Am';
-                text.textContent = 'Pakej PA (7 Kajian) - RM6.00. Pilih destinasi:';
-                orderBtn.href = 'https://t.me/CariKajianLepasStpm_bot?start=order_pa';
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                
+                // Connect particles
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = particles[i].color;
+                        ctx.globalAlpha = 0.1 * (1 - distance / 100);
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                        ctx.globalAlpha = 1;
+                    }
+                }
             }
             
-            modal.classList.add('active');
+            requestAnimationFrame(animate);
         }
 
-        function closeModal() {
-            document.getElementById('orderModal').classList.remove('active');
-        }
+        init();
+        animate();
 
-        // Close modal when clicking outside
-        document.getElementById('orderModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
+        // Resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         });
+
+        // Mouse interaction
+        window.addEventListener('mousemove', (e) => {
+            for (let i = 0; i < particles.length; i++) {
+                const dx = particles[i].x - e.clientX;
+                const dy = particles[i].y - e.clientY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 100) {
+                    particles[i].x += dx * 0.01;
+                    particles[i].y += dy * 0.01;
+                }
+            }
+        });
+
+        // Loader function
+        function showLoader(e) {
+            e.preventDefault();
+            const loader = document.getElementById('loader');
+            loader.classList.add('active');
+            
+            setTimeout(() => {
+                window.location.href = 'harga.html';
+            }, 1500);
+        }
+
+        // Glitch text randomizer
+        const glitchText = document.querySelector('.glitch');
+        const texts = ['4 FLAT', 'A+', 'CEMERLANG', 'EXCELLENT'];
+        let textIndex = 0;
+
+        setInterval(() => {
+            textIndex = (textIndex + 1) % texts.length;
+            glitchText.setAttribute('data-text', texts[textIndex]);
+            glitchText.textContent = texts[textIndex];
+        }, 3000);
     </script>
 </body>
 </html>
