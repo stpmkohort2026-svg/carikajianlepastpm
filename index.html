@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Servis Cari Kajian Lepas STPM - 4 Flat Di Dalam Tangan</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;800&family=Orbitron:wght@400;700;900&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -19,504 +20,869 @@
             --secondary: #ff00ff;
             --accent: #ffd700;
             --dark: #050508;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
             font-family: 'Space Grotesk', sans-serif;
             background: var(--dark);
-            min-height: 100vh;
-            overflow-x: hidden;
             color: white;
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        /* Three.js Canvas */
-        #canvas-container {
+        /* Mouse Trail Canvas */
+        #mouse-trail {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            pointer-events: none;
+            z-index: 9999;
         }
 
-        /* Scanlines & Noise */
+        /* Three.js Background - Optimized */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Scanlines */
         .scanlines {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0) 50%,
-                rgba(0,0,0,0.1) 50%
-            );
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 50%);
             background-size: 100% 4px;
-            z-index: 5;
             pointer-events: none;
-            opacity: 0.4;
+            z-index: 1000;
+            opacity: 0.3;
         }
 
-        .noise {
+        /* Navigation */
+        .nav {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 6;
-            pointer-events: none;
-            opacity: 0.05;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            right: 0;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            backdrop-filter: blur(10px);
         }
 
-        .vignette {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
-            z-index: 7;
-            pointer-events: none;
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Main Container */
-        .container {
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
             position: relative;
-            z-index: 20;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-        }
-
-        /* Hero Text */
-        .hero-text {
             text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .glitch-container {
+            padding: 100px 20px;
             position: relative;
-            display: inline-block;
         }
 
-        .main-title {
-            font-family: 'Syncopate', sans-serif;
-            font-size: 5rem;
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(255,215,0,0); }
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 10vw, 6rem);
             font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
+            line-height: 1.1;
+            margin-bottom: 20px;
             background: linear-gradient(135deg, #fff 0%, var(--primary) 50%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0,212,255,0.5);
-            animation: glowPulse 2s ease-in-out infinite alternate;
+            animation: glow 3s ease-in-out infinite alternate;
         }
 
-        @keyframes glowPulse {
-            from { filter: drop-shadow(0 0 20px rgba(0,212,255,0.8)); }
-            to { filter: drop-shadow(0 0 40px rgba(255,0,255,0.8)); }
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(0,212,255,0.5)); }
+            to { filter: drop-shadow(0 0 40px rgba(255,0,255,0.5)); }
         }
 
-        .cyber-subtitle {
-            margin-top: 20px;
-            font-family: 'Orbitron', monospace;
+        .hero-subtitle {
             font-size: 1.3rem;
-            letter-spacing: 0.3em;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
         }
 
-        /* 3D Cards */
-        .cards-container {
-            display: flex;
-            gap: 25px;
-            margin: 40px 0;
-            perspective: 2000px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .card-3d {
-            width: 260px;
-            height: 180px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s;
-            cursor: pointer;
-        }
-
-        .card-3d:hover {
-            transform: rotateY(180deg);
-        }
-
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        .hero-cta {
+            display: inline-flex;
             align-items: center;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .card-front {
-            background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,0,0,0.3));
-            backdrop-filter: blur(10px);
-        }
-
-        .card-back {
-            background: linear-gradient(135deg, rgba(255,0,255,0.1), rgba(0,0,0,0.3));
-            backdrop-filter: blur(10px);
-            transform: rotateY(180deg);
-        }
-
-        .card-icon {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-        }
-
-        .card-title {
+            gap: 15px;
+            padding: 20px 50px;
+            background: linear-gradient(135deg, var(--primary), #0099cc);
+            border: none;
+            border-radius: 50px;
+            color: white;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,212,255,0.3);
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,212,255,0.5);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        /* Pricing Cards */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .price-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+
+        .price-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 30px 60px rgba(0,212,255,0.2);
+        }
+
+        .price-card.featured {
+            border: 2px solid var(--accent);
+            transform: scale(1.05);
+        }
+
+        .price-card.featured:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+
+        .price-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .price-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
             color: var(--primary);
         }
 
-        .card-price {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--accent);
-        }
-
-        /* BUTTON CONTAINER - PALING PENTING */
-        .button-container {
-            margin-top: 50px;
-            text-align: center;
-            position: relative;
-            z-index: 100;
-        }
-
-        /* MAIN CTA BUTTON - BESAR & NAMPAK */
-        .main-cta-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            padding: 30px 60px;
-            background: linear-gradient(135deg, var(--primary), #0099cc);
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 60px;
-            color: white;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
+        .price-amount {
+            font-size: 4rem;
             font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .price-amount span {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .price-features {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .price-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .price-btn {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
             text-decoration: none;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 10px 40px rgba(0,212,255,0.4),
-                0 0 60px rgba(0,212,255,0.2),
-                inset 0 1px 0 rgba(255,255,255,0.3);
-            animation: buttonPulse 2s infinite, buttonFloat 3s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        .price-btn:hover {
+            background: var(--primary);
+            color: black;
+        }
+
+        .price-card.featured .price-btn {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: black;
+        }
+
+        /* Add-ons Section */
+        .addons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .addon-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             transition: all 0.3s;
         }
 
-        @keyframes buttonPulse {
-            0%, 100% { 
-                box-shadow: 
-                    0 10px 40px rgba(0,212,255,0.4),
-                    0 0 60px rgba(0,212,255,0.2);
-            }
-            50% { 
-                box-shadow: 
-                    0 15px 50px rgba(0,212,255,0.6),
-                    0 0 80px rgba(0,212,255,0.4),
-                    0 0 100px rgba(0,212,255,0.2);
-            }
+        .addon-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateX(10px);
         }
 
-        @keyframes buttonFloat {
+        .addon-name {
+            font-size: 1.1rem;
+        }
+
+        .addon-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Speed Badge */
+        .speed-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .speed-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(135deg, rgba(255,0,100,0.2), rgba(255,0,100,0.05));
+            border: 2px solid rgba(255,0,100,0.4);
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #ff4d8d;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,0,100,0.4); }
+            50% { box-shadow: 0 0 40px rgba(255,0,100,0.6); }
+        }
+
+        /* Contact Section */
+        .contact-section {
+            text-align: center;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 40px;
+            border-radius: 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-telegram {
+            background: linear-gradient(135deg, #0088cc, #00a8e6);
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,136,204,0.3);
+        }
+
+        .btn-telegram:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,136,204,0.4);
+        }
+
+        .btn-group {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-group:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+        }
+
+        /* AI Chatbot */
+        .chatbot-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            max-height: 500px;
+            background: rgba(10,10,15,0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            z-index: 1000;
+            transform: translateY(150%);
+            transition: transform 0.4s;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .chatbot-container.active {
+            transform: translateY(0);
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .chatbot-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message.bot {
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.2);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            background: rgba(255,0,255,0.1);
+            border: 1px solid rgba(255,0,255,0.2);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .chatbot-input input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .chatbot-send {
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-left: 10px;
+            color: black;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chatbot-send:hover {
+            background: white;
+        }
+
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,212,255,0.4);
+            transition: all 0.3s;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
 
-        .main-cta-button:hover {
-            transform: scale(1.05) translateY(-5px);
-            background: linear-gradient(135deg, #00e5ff, #00b4d8);
-            box-shadow: 
-                0 20px 60px rgba(0,212,255,0.6),
-                0 0 100px rgba(0,212,255,0.4);
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0,212,255,0.6);
         }
 
-        .main-cta-button::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent 30%,
-                rgba(255,255,255,0.3) 50%,
-                transparent 70%
-            );
-            transform: rotate(45deg) translateX(-100%);
-            transition: transform 0.6s;
-        }
-
-        .main-cta-button:hover::before {
-            transform: rotate(45deg) translateX(100%);
-        }
-
-        .button-arrow {
-            font-size: 2rem;
-            animation: arrowBounce 1s infinite;
-        }
-
-        @keyframes arrowBounce {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(10px); }
-        }
-
-        /* Secondary text under button */
-        .button-subtext {
-            margin-top: 20px;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-        }
-
-        /* Scroll indicator */
-        .scroll-indicator {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-10px); }
-        }
-
-        /* Loading Screen */
-        .loader-screen {
+        /* Voice Welcome Button */
+        .voice-btn {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            transition: opacity 0.8s, visibility 0.8s;
-        }
-
-        .loader-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loader-ring {
-            width: 100px;
-            height: 100px;
-            border: 4px solid transparent;
-            border-top-color: var(--primary);
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--accent);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loader-text {
-            margin-top: 20px;
-            font-family: 'Orbitron', sans-serif;
-            color: var(--primary);
-            letter-spacing: 3px;
-        }
-
-        /* Music Control */
-        .music-control {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 100;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 50px;
-            padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: var(--accent);
+            font-size: 1.2rem;
             cursor: pointer;
+            z-index: 1000;
             transition: all 0.3s;
         }
 
-        .music-control:hover {
-            border-color: var(--primary);
+        .voice-btn:hover {
+            background: var(--accent);
+            color: black;
         }
 
-        /* Responsive */
+        .voice-btn.speaking {
+            animation: sound-wave 1s infinite;
+        }
+
+        @keyframes sound-wave {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(255,215,0,0); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+        }
+
+        footer strong {
+            color: var(--accent);
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .main-title {
-                font-size: 3rem;
+            .nav {
+                padding: 15px 20px;
             }
-            .main-cta-button {
-                padding: 20px 40px;
-                font-size: 1.2rem;
+            
+            .nav-links {
+                display: none;
             }
-            .cards-container {
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .price-card.featured {
+                transform: scale(1);
+            }
+            
+            .chatbot-container {
+                width: 90%;
+                right: 5%;
+                bottom: 90px;
+            }
+            
+            .contact-buttons {
                 flex-direction: column;
                 align-items: center;
+            }
+            
+            .contact-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            z-index: 1001;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Reduce Motion for Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loader-screen" id="loader">
-        <div class="loader-ring"></div>
-        <div class="loader-text">Cari Kajian Lepas Kohort 2026...</div>
-    </div>
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
 
-    <!-- Three.js Canvas -->
-    <div id="canvas-container"></div>
+    <!-- Mouse Trail Canvas -->
+    <canvas id="mouse-trail"></canvas>
 
-    <!-- Effects -->
+    <!-- Three.js Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Scanlines -->
     <div class="scanlines"></div>
-    <div class="noise"></div>
-    <div class="vignette"></div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div class="hero-text">
-            <div class="glitch-container">
-                <h1 class="main-title">4 FLAT</h1>
-            </div>
-            <div class="cyber-subtitle">DI DALAM TANGAN ANDA</div>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="logo">4 FLAT STPM</div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#pricing">Harga</a>
+            <a href="#addons">Add-on</a>
+            <a href="#contact">Contact</a>
         </div>
+    </nav>
 
-        <div class="cards-container">
-            <div class="card-3d">
-                <div class="card-face card-front">
-                    <span class="card-icon">📜</span>
-                    <h3 class="card-title">SEJARAH</h3>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">4 Kajian</p>
-                </div>
-                <div class="card-face card-back">
-                    <span class="card-icon">💎</span>
-                    <div class="card-price">RM3</div>
-                </div>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-badge">✨ SERVIS PREMIUM</div>
+        <h1>4 FLAT</h1>
+        <p class="hero-subtitle">DI DALAM TANGAN ANDA</p>
+        <a href="#pricing" class="hero-cta">
+            <span>Lihat Senarai Harga</span>
+            <span>↓</span>
+        </a>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing">
+        <h2 class="section-title">SENARAI HARGA</h2>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <div class="price-icon">📜</div>
+                <h3 class="price-title">SEJARAH</h3>
+                <div class="price-amount">RM3<span>/pakej</span></div>
+                <ul class="price-features">
+                    <li>✅ 4 Kajian Lengkap</li>
+                    <li>✅ Harga Satuan: RM1</li>
+                    <li>✅ Bawah 4 unit</li>
+                    <li>✅ 10 Minit Siap</li>
+                </ul>
+                <button class="price-btn" onclick="orderNow('sejarah')">Order Sekarang</button>
             </div>
 
-            <div class="card-3d">
-                <div class="card-face card-front">
-                    <span class="card-icon">🇲🇾</span>
-                    <h3 class="card-title">PENGAJIAN AM</h3>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">7 Kajian</p>
-                </div>
-                <div class="card-face card-back">
-                    <span class="card-icon">⚡</span>
-                    <div class="card-price">RM6</div>
-                </div>
+            <div class="price-card featured">
+                <div style="position: absolute; top: 20px; right: 20px; background: var(--accent); color: black; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">POPULAR</div>
+                <div class="price-icon">🇲🇾</div>
+                <h3 class="price-title">PENGAJIAN AM</h3>
+                <div class="price-amount">RM6<span>/pakej</span></div>
+                <ul class="price-features">
+                    <li>✅ 7 Kajian Lengkap</li>
+                    <li>✅ Harga Satuan: RM1</li>
+                    <li>✅ Bawah 7 unit</li>
+                    <li>✅ 10 Minit Siap</li>
+                    <li>✅ Bonus Material</li>
+                </ul>
+                <button class="price-btn" onclick="orderNow('pa')">Order Sekarang</button>
             </div>
 
-            <div class="card-3d">
-                <div class="card-face card-front">
-                    <span class="card-icon">✍️</span>
-                    <h3 class="card-title">ADD-ON</h3>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Servis Tambahan</p>
-                </div>
-                <div class="card-face card-back">
-                    <span class="card-icon">🚀</span>
-                    <div class="card-price">RM2-3</div>
-                </div>
+            <div class="price-card">
+                <div class="price-icon">✍️</div>
+                <h3 class="price-title">CUSTOM</h3>
+                <div class="price-amount">RM1<span>/kajian</span></div>
+                <ul class="price-features">
+                    <li>✅ Satuan Sejarah</li>
+                    <li>✅ Satuan PA</li>
+                    <li>✅ Minimum Order</li>
+                    <li>✅ Flexible</li>
+                </ul>
+                <button class="price-btn" onclick="orderNow('custom')">Order Sekarang</button>
             </div>
         </div>
+    </section>
 
-        <!-- BUTTON CONTAINER - PALING PENTING -->
-        <div class="button-container">
-            <a href="harga.html" class="main-cta-button" onclick="goToHarga(event)">
-                <span>🛒</span>
-                <span>LIHAT SENARAI HARGA</span>
-                <span class="button-arrow">→</span>
+    <!-- Add-ons Section -->
+    <section id="addons">
+        <h2 class="section-title">SERVIS TAMBAHAN</h2>
+        <div class="addons-grid">
+            <div class="addon-item">
+                <span class="addon-name">📝 Rumusan Kajian</span>
+                <span class="addon-price">RM 2</span>
+            </div>
+            <div class="addon-item">
+                <span class="addon-name">📚 Bibliografi</span>
+                <span class="addon-price">RM 3</span>
+            </div>
+            <div class="addon-item">
+                <span class="addon-name">🔍 Format APA</span>
+                <span class="addon-price">RM 1</span>
+            </div>
+            <div class="addon-item">
+                <span class="addon-name">⚡ Express Delivery</span>
+                <span class="addon-price">RM 2</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Speed Section -->
+    <div class="speed-section">
+        <div class="speed-badge">
+            <span>⚡</span>
+            <span>10 MINIT SIAP!</span>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <h2 class="section-title">HUBUNGI KAMI</h2>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px;">Pilih cara untuk order atau join group official</p>
+        <div class="contact-buttons">
+            <a href="https://t.me/CariKajianLepasStpm_bot" target="_blank" class="contact-btn btn-telegram">
+                <span>📨</span>
+                <span>Order via Telegram</span>
             </a>
-            <div class="button-subtext">Klik untuk melihat pakej lengkap & order</div>
+            <a href="https://t.me/stpm20266" target="_blank" class="contact-btn btn-group">
+                <span>👥</span>
+                <span>Join Official Group</span>
+            </a>
         </div>
+    </section>
 
-        <p style="margin-top: 40px; color: rgba(255,255,255,0.3); font-size: 0.8rem;">
-            SERVIS CARI KAJIAN LEPAS STPM © 2026
-        </p>
+    <!-- Footer -->
+    <footer>
+        <p><strong>STPM 2026 SILIBUS BAHARU 07</strong> (@stpm20266)</p>
+        <p>Servis Cari Kajian Lepas STPM © 2026</p>
+        <p style="margin-top: 10px; font-size: 0.8rem;">4 Flat Di Dalam Tangan 🎯</p>
+    </footer>
+
+    <!-- AI Chatbot -->
+    <div class="chatbot-container" id="chatbot">
+        <div class="chatbot-header">
+            <div class="chatbot-title">
+                <span>🤖</span>
+                <span>AI Assistant</span>
+            </div>
+            <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="message bot">Hi! Saya AI assistant. Nak tanya apa tentang servis kami? 😊</div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatInput" placeholder="Taip mesej..." onkeypress="handleChatKeypress(event)">
+            <button class="chatbot-send" onclick="sendMessage()">➤</button>
+        </div>
     </div>
 
-    <!-- Scroll Indicator -->
-    <div class="scroll-indicator">
-        <span>SCROLL</span>
-        <span>↓</span>
-    </div>
+    <button class="chatbot-toggle" onclick="toggleChatbot()">💬</button>
 
-    <!-- Music Control -->
-    <div class="music-control" onclick="toggleMusic()">
-        <span id="musicIcon">🎵</span>
-        <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Music</span>
-    </div>
-
-    <!-- Audio -->
-    <audio id="bgMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Voice Welcome Button -->
+    <button class="voice-btn" id="voiceBtn" onclick="playVoiceWelcome()" title="Play Voice Welcome">🔊</button>
 
     <script>
-        // Hide loader
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').classList.add('hidden');
-                initThreeJS();
-            }, 1500);
-        });
-
-        // Three.js
+        // ===== OPTIMIZED THREE.JS BACKGROUND =====
+        let scene, camera, renderer, particles;
+        let isMobile = window.matchMedia("(pointer: coarse)").matches;
+        
         function initThreeJS() {
-            const container = document.getElementById('canvas-container');
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            const canvas = document.getElementById('bg-canvas');
+            
+            // Reduce quality for mobile
+            const pixelRatio = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
+            
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !isMobile });
             
             renderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(renderer.domElement);
-
-            // Particles
+            renderer.setPixelRatio(pixelRatio);
+            
+            // Particles - reduced count for performance
+            const count = isMobile ? 500 : 1500;
             const geometry = new THREE.BufferGeometry();
-            const count = 1500;
             const positions = new Float32Array(count * 3);
             const colors = new Float32Array(count * 3);
-
+            
             for(let i = 0; i < count * 3; i += 3) {
                 positions[i] = (Math.random() - 0.5) * 50;
                 positions[i+1] = (Math.random() - 0.5) * 50;
@@ -526,99 +892,303 @@
                 colors[i+1] = Math.random() > 0.5 ? 0.8 : 0;
                 colors[i+2] = 1;
             }
-
+            
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
+            
             const material = new THREE.PointsMaterial({
-                size: 0.08,
+                size: isMobile ? 0.05 : 0.08,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.8,
+                opacity: 0.6,
                 blending: THREE.AdditiveBlending
             });
-
-            const particles = new THREE.Points(geometry, material);
+            
+            particles = new THREE.Points(geometry, material);
             scene.add(particles);
-
-            // Wireframe spheres
-            const sphere1 = new THREE.Mesh(
-                new THREE.IcosahedronGeometry(10, 1),
-                new THREE.MeshBasicMaterial({ color: 0x00d4ff, wireframe: true, transparent: true, opacity: 0.1 })
-            );
-            scene.add(sphere1);
-
-            const sphere2 = new THREE.Mesh(
-                new THREE.IcosahedronGeometry(15, 1),
-                new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true, transparent: true, opacity: 0.05 })
-            );
-            scene.add(sphere2);
-
-            camera.position.z = 30;
-
-            // Mouse
-            let mouseX = 0, mouseY = 0;
-            document.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            
+            // Wireframe spheres - only 1 for mobile
+            const sphereGeo = new THREE.IcosahedronGeometry(10, 1);
+            const sphereMat = new THREE.MeshBasicMaterial({ 
+                color: 0x00d4ff, 
+                wireframe: true, 
+                transparent: true, 
+                opacity: 0.08 
             });
-
+            const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+            scene.add(sphere);
+            
+            if(!isMobile) {
+                const sphere2 = new THREE.Mesh(
+                    new THREE.IcosahedronGeometry(15, 1),
+                    new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true, transparent: true, opacity: 0.05 })
+                );
+                scene.add(sphere2);
+            }
+            
+            camera.position.z = 30;
+            
+            // Optimized animation
+            let frameCount = 0;
             function animate() {
                 requestAnimationFrame(animate);
+                frameCount++;
                 
-                particles.rotation.y += 0.001;
-                particles.rotation.x += 0.0005;
-                
-                sphere1.rotation.y += 0.002;
-                sphere2.rotation.y -= 0.001;
-                
-                camera.position.x += (mouseX * 2 - camera.position.x) * 0.05;
-                camera.position.y += (mouseY * 2 - camera.position.y) * 0.05;
-                camera.lookAt(scene.position);
+                // Skip frames for performance
+                if(frameCount % (isMobile ? 2 : 1) === 0) {
+                    particles.rotation.y += 0.0005;
+                    sphere.rotation.y += 0.001;
+                }
                 
                 renderer.render(scene, camera);
             }
             animate();
+        }
 
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+        // ===== MOUSE TRAIL =====
+        const trailCanvas = document.getElementById('mouse-trail');
+        const trailCtx = trailCanvas.getContext('2d');
+        let trailParticles = [];
+        
+        function initMouseTrail() {
+            if(isMobile) return; // Disable on mobile
+            
+            trailCanvas.width = window.innerWidth;
+            trailCanvas.height = window.innerHeight;
+            
+            let mouseX = 0, mouseY = 0;
+            let isMoving = false;
+            let moveTimeout;
+            
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                isMoving = true;
+                
+                clearTimeout(moveTimeout);
+                moveTimeout = setTimeout(() => isMoving = false, 100);
+                
+                // Add particles on move
+                if(trailParticles.length < 50) {
+                    trailParticles.push({
+                        x: mouseX,
+                        y: mouseY,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 1,
+                        color: Math.random() > 0.5 ? '#00d4ff' : '#ff00ff'
+                    });
+                }
+            });
+            
+            function animateTrail() {
+                trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+                
+                trailParticles = trailParticles.filter(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.02;
+                    
+                    if(p.life > 0) {
+                        trailCtx.beginPath();
+                        trailCtx.arc(p.x, p.y, 3 * p.life, 0, Math.PI * 2);
+                        trailCtx.fillStyle = p.color;
+                        trailCtx.globalAlpha = p.life;
+                        trailCtx.fill();
+                        return true;
+                    }
+                    return false;
+                });
+                
+                requestAnimationFrame(animateTrail);
+            }
+            animateTrail();
+        }
+
+        // ===== SCROLL SOUND =====
+        let lastScrollY = 0;
+        let scrollSoundEnabled = true;
+        
+        // Create audio context for scroll sound
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playScrollSound() {
+            if(!scrollSoundEnabled || isMobile) return;
+            
+            const currentScrollY = window.scrollY;
+            const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+            
+            if(scrollDelta > 50) {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 200 + (scrollDelta * 2);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+                
+                lastScrollY = currentScrollY;
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            // Update progress bar
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scrollProgress').style.width = scrolled + '%';
+            
+            // Play scroll sound
+            playScrollSound();
+        });
+
+        // ===== AI CHATBOT =====
+        const chatbotResponses = {
+            'harga': 'Harga kami: Sejarah RM3 (4 kajian), PA RM6 (7 kajian), Satuan RM1. Add-on Rumusan RM2, Bibliografi RM3.',
+            'order': 'Boleh order terus di Telegram @CariKajianLepasStpm_bot atau klik butang Order di website ni!',
+            'sejarah': 'Pakej Sejarah RM3 dapat 4 kajian. Kalau nak satuan, RM1 per kajian (minimum 4). Siap dalam 10 minit!',
+            'pa': 'Pakej Pengajian Am RM6 dapat 7 kajian. Satuan RM1 (minimum 7). Paling popular ni!',
+            'addon': 'Add-on kami: Rumusan Kajian RM2, Bibliografi RM3, Format APA RM1, Express Delivery RM2.',
+            'cepat': 'Ye! Kami guarantee 10 minit siap untuk setiap order. Express delivery available juga.',
+            'group': 'Join group official kami @stpm20266 untuk update dan discussion!',
+            'contact': 'Hubungi kami: Telegram @CariKajianLepasStpm_bot atau join group @stpm20266',
+            'hello': 'Hi! 👋 Nak tanya apa tentang servis kami?',
+            'hi': 'Hello! 😊 Saya boleh bantu anda dengan info tentang kajian STPM.',
+            'terima kasih': 'Sama-sama! 🙏 Ada apa-apa lagi nak tanya?',
+            'thanks': 'You\'re ! 🎉',
+            'default': 'Maaf, saya tak faham. Boleh tanya tentang harga, order, sejarah, PA, atau addon?'
+        };
+
+        function toggleChatbot() {
+            document.getElementById('chatbot').classList.toggle('active');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if(message) {
+                addMessage(message, 'user');
+                input.value = '';
+                
+                setTimeout(() => {
+                    const response = getAIResponse(message.toLowerCase());
+                    addMessage(response, 'bot');
+                }, 500);
+            }
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const msg = document.createElement('div');
+            msg.className = `message ${sender}`;
+            msg.textContent = text;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function getAIResponse(input) {
+            for(let key in chatbotResponses) {
+                if(input.includes(key)) return chatbotResponses[key];
+            }
+            return chatbotResponses['default'];
+        }
+
+        function handleChatKeypress(e) {
+            if(e.key === 'Enter') sendMessage();
+        }
+
+        // ===== VOICE WELCOME =====
+        function playVoiceWelcome() {
+            if('speechSynthesis' in window) {
+                const btn = document.getElementById('voiceBtn');
+                btn.classList.add('speaking');
+                
+                const text = 'Welcome To Pencarian Kajian Lepas Stpm Kohort 2026 ';
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ms-MY';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                
+                utterance.onend = () => btn.classList.remove('speaking');
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Browser anda tidak support text-to-speech');
+            }
+        }
+
+        // Auto play voice on first visit (optional)
+        let voicePlayed = localStorage.getItem('voicePlayed');
+        if(!voicePlayed) {
+            setTimeout(() => {
+                playVoiceWelcome();
+                localStorage.setItem('voicePlayed', 'true');
+            }, 2000);
+        }
+
+        // ===== ORDER FUNCTION =====
+        function orderNow(subject) {
+            const messages = {
+                'sejarah': 'Saya nak order Pakej Sejarah (4 Kajian) RM3',
+                'pa': 'Saya nak order Pakej Pengajian Am (7 Kajian) RM6',
+                'custom': 'Saya nak order kajian satuan'
+            };
+            
+            const url = `https://t.me/CariKajianLepasStpm_bot?start=${subject}&text=${encodeURIComponent(messages[subject])}`;
+            window.open(url, '_blank');
+        }
+
+        // ===== GSAP ANIMATIONS =====
+        if(typeof gsap !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Animate sections on scroll
+            gsap.utils.toArray('section').forEach(section => {
+                gsap.from(section.children, {
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+                    stagger: 0.2,
+                    scrollTrigger: {
+                        trigger: section,
+                        start: 'top 80%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
             });
         }
 
-        // Go to harga page
-        function goToHarga(e) {
-            e.preventDefault();
-            document.getElementById('loader').classList.remove('hidden');
-            document.querySelector('.loader-text').textContent = 'LOADING...';
-            setTimeout(() => {
-                window.location.href = 'harga.html';
-            }, 1000);
-        }
+        // ===== INIT =====
+        window.addEventListener('load', () => {
+            initThreeJS();
+            initMouseTrail();
+        });
 
-        // Music
-        let isPlaying = false;
-        const music = document.getElementById('bgMusic');
-        function toggleMusic() {
-            if(isPlaying) {
-                music.pause();
-                document.getElementById('musicIcon').textContent = '🎵';
-            } else {
-                music.play();
-                document.getElementById('musicIcon').textContent = '🔊';
-            }
-            isPlaying = !isPlaying;
-        }
-
-        // Text change
-        setInterval(() => {
-            const texts = ['4 FLAT', 'A+', 'CEMERLANG'];
-            const title = document.querySelector('.main-title');
-            const current = title.textContent;
-            const next = texts[(texts.indexOf(current) + 1) % texts.length];
-            title.textContent = next;
-        }, 3000);
+        // Resize handler
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if(camera && renderer) {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                }
+                if(trailCanvas) {
+                    trailCanvas.width = window.innerWidth;
+                    trailCanvas.height = window.innerHeight;
+                }
+            }, 250);
+        });
     </script>
 </body>
 </html>
